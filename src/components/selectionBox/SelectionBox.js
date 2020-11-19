@@ -3,11 +3,10 @@ import React from 'react';
 import styles from './Styles.scss';
 
 const SelectionBox = (props) => {
-  const [id, setSelectedId] = React.useState(-1);
-
   const handleClick = () => {
     props.selectAnswer(!props.answerSelected);
-    setSelectedId(id === -1 ? props.id : -1);
+    props.setSelectedAnswerId(props.selectedAnswerId === -1 ? props.id : -1);
+    props.setCorrectAnswersNum(props.correctAnswersNum - 1);
   };
 
   return (
@@ -15,7 +14,8 @@ const SelectionBox = (props) => {
       className="selectionBox"
       id={'selectionBox' + props.id}
       style={{
-        backgroundColor: id === props.id ? styles.grassBlade : 'white',
+        backgroundColor:
+          props.selectedAnswerId === props.id ? styles.morningSky : 'white',
       }}
     >
       <img

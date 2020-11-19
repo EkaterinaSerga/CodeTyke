@@ -14,7 +14,9 @@ const LearningModule = ({ setGameStatus }) => {
   const [showLoader, setShowLoader] = React.useState(false);
   const [showModal, setShowModal] = React.useState(false);
   const [answerSelected, setAnswerSelected] = React.useState(false);
-  const [correctAnswer, setCorrectAnswer] = React.useState('undefined');
+  const [selectedAnswerId, setSelectedAnswerId] = React.useState(-1);
+  const [correctAnswer, setCorrectAnswer] = React.useState(undefined);
+  const [correctAnswersNum, setCorrectAnswersNum] = React.useState(1);
 
   let currentQuestion = quizData.questionArr
     ? quizData.questionArr[currentQuestionId]
@@ -37,16 +39,33 @@ const LearningModule = ({ setGameStatus }) => {
   };
 
   const checkAnswer = (answer) => {
-    if (answer.isCorrect) setCorrectAnswer(true);
-    else setCorrectAnswer(false);
+    if (answer.isCorrect && !correctAnswersNum) {
+      setCorrectAnswer(true);
+      alert('Correct');
+      setSelectedAnswerId(-1);
+      setAnswerSelected(false);
+      return true;
+    } else if (answer.isCorrect && correctAnswersNum) {
+      setCorrectAnswer(undefined);
+      alert('Not all');
+      return undefined;
+    } else {
+      setCorrectAnswer(false);
+      alert('Try again');
+      return false;
+    }
   };
 
   const handleSubmit = () => {
     if (currentQuestionId < quizData.totalQuestions - 1) {
       setShowLoader(true);
       setTimeout(function () {
-        console.log('Checking answer...');
-        setCurrentQuestionId(currentQuestionId + 1);
+        const correct = checkAnswer(
+          currentQuestion.possibleAnswers[selectedAnswerId]
+        );
+        if (correct) {
+          setCurrentQuestionId(currentQuestionId + 1);
+        }
         setShowLoader(false);
       }, 500);
     } else {
@@ -64,6 +83,10 @@ const LearningModule = ({ setGameStatus }) => {
           answer={answer}
           selectAnswer={setAnswerSelected}
           answerSelected={answerSelected}
+          selectedAnswerId={selectedAnswerId}
+          setSelectedAnswerId={setSelectedAnswerId}
+          setCorrectAnswersNum={setCorrectAnswersNum}
+          correctAnswersNum={correctAnswersNum}
         />
       );
     });
