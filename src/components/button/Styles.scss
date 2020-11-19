@@ -2,13 +2,19 @@
 @import '../../styles/utils/breakpoints';
 @import '../../styles/utils/mixins';
 
+:export {
+  grassBlade: $grass-blade;
+  elephantPaw: $elephant-paw;
+  barney: $barney;
+}
+
 $size: 50px;
 
-.submitButton{
+.submitButton {
   background-color: $grass-blade;
   border-radius: $size / 2;
   color: white;
-  font-size: $size * .4;
+  font-size: $size * 0.4;
   font-weight: 600;
   height: $size;
   line-height: $size;
@@ -19,8 +25,9 @@ $size: 50px;
     padding: 0 20px;
   }
 
-  &.hasIcons{
-    .icon, .placeholder {
+  &.hasIcons {
+    .icon,
+    .placeholder {
       width: 44px;
       display: inline-block;
     }
@@ -30,7 +37,7 @@ $size: 50px;
   .spinningLoader {
     animation: rotate-s-loader 1.6s linear infinite;
   }
-  
+
   @keyframes rotate-s-loader {
     from {
       transform: rotate(0);

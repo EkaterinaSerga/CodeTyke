@@ -8,85 +8,117 @@ import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 
 import './Styles.scss';
 
-const LearningModule = ({setGameStatus}) => {
+const LearningModule = ({ setGameStatus }) => {
   const [currentQuestionId, setCurrentQuestionId] = React.useState(0);
   const [quizData, setQuizData] = React.useState({});
   const [showLoader, setShowLoader] = React.useState(false);
   const [showModal, setShowModal] = React.useState(false);
+  const [answerSelected, setAnswerSelected] = React.useState(false);
+  const [correctAnswer, setCorrectAnswer] = React.useState('undefined');
 
-  let currentQuestion = quizData.questionArr ? quizData.questionArr[currentQuestionId]: {};
-  React.useEffect(()=>{
+  let currentQuestion = quizData.questionArr
+    ? quizData.questionArr[currentQuestionId]
+    : {};
+  React.useEffect(() => {
     getQuizData();
-  },[]);
+  }, []);
 
-  const getQuizData=()=>{
-    fetch("http://localhost:8080/problems")
-      .then((res)=>{
+  const getQuizData = () => {
+    fetch('http://localhost:8080/problems')
+      .then((res) => {
         return res.json();
-      }).then((data)=>{
+      })
+      .then((data) => {
         setQuizData(data);
-      }).catch((err)=>{
+      })
+      .catch((err) => {
         console.log(err);
       });
-  }
+  };
 
-  const handleSubmit=()=> {
-    if(currentQuestionId < quizData.totalQuestions-1){
+  const checkAnswer = (answer) => {
+    if (answer.isCorrect) setCorrectAnswer(true);
+    else setCorrectAnswer(false);
+  };
+
+  const handleSubmit = () => {
+    if (currentQuestionId < quizData.totalQuestions - 1) {
       setShowLoader(true);
-      setTimeout(function(){
-        console.log("Checking answer...");
-        setCurrentQuestionId(currentQuestionId+1);
+      setTimeout(function () {
+        console.log('Checking answer...');
+        setCurrentQuestionId(currentQuestionId + 1);
         setShowLoader(false);
-      }, 500 );
+      }, 500);
     } else {
       setCurrentQuestionId(0);
-      setGameStatus({message: "Great Job! Play again.", loadIntro: true});
+      setGameStatus({ message: 'Great Job! Play again.', loadIntro: true });
     }
-  }
+  };
   let possibleAnswers = [];
-  if(currentQuestion.possibleAnswers){
+  if (currentQuestion.possibleAnswers) {
     possibleAnswers = currentQuestion.possibleAnswers.map((answer, index) => {
-      return <SelectionBox id={index} key={index} answer={answer} />
-    })
+      return (
+        <SelectionBox
+          id={index}
+          key={index}
+          answer={answer}
+          selectAnswer={setAnswerSelected}
+          answerSelected={answerSelected}
+        />
+      );
+    });
   }
 
   const toggleAdditionalInfo = () => {
     setShowModal(!showModal);
-  }
+  };
 
   return (
     <div className="learningModule">
-      { currentQuestion.title &&
+      {currentQuestion.title && (
         <>
-          <div className="learningModule--overlay"  onClick={toggleAdditionalInfo} style={{display: showModal ? "block" : "none"}}></div>
+          <div
+            className="learningModule--overlay"
+            onClick={toggleAdditionalInfo}
+            style={{ display: showModal ? 'block' : 'none' }}
+          ></div>
           <Modal showModal={showModal} setShowModal={setShowModal}>
             {currentQuestion.additionalInfo}
           </Modal>
-          <ProgressBar totalQuestions={quizData.totalQuestions} id={currentQuestion.id} />
+          <ProgressBar
+            totalQuestions={quizData.totalQuestions}
+            id={currentQuestion.id}
+          />
           <div className="learningModule--header">
-            <div className="learningModule--title">
-              { currentQuestion.title }
-            </div>
+            <div className="learningModule--title">{currentQuestion.title}</div>
             <div className="learningModule--additionalInfoIcon">
-                <FontAwesomeIcon icon={faInfoCircle} onClick={toggleAdditionalInfo} size="lg" />
-              </div>
+              <FontAwesomeIcon
+                icon={faInfoCircle}
+                onClick={toggleAdditionalInfo}
+                size="lg"
+              />
+            </div>
             <div className="learningModule--subHeader">
-              { currentQuestion.additionalInfo }
+              {currentQuestion.additionalInfo}
             </div>
           </div>
 
           <div className="learningModule--answerArea">
-            <div className="learningModule--selections">
-              { possibleAnswers }
-            </div>
+            <div className="learningModule--selections">{possibleAnswers}</div>
             <div className="learningModule--submitButtonContainer">
-              <Button label="Submit" handleSubmit={ handleSubmit } showLoader={showLoader} hasIcons />
+              <Button
+                label="Submit"
+                handleSubmit={handleSubmit}
+                showLoader={showLoader}
+                hasIcons
+                answerSelected={answerSelected}
+              />
             </div>
           </div>
         </>
-      }
+      )}
     </div>
-  )
-}
+  );
+};
 
 export default LearningModule;
